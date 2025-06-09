@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Cart</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .cart-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .cart-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .cart-item:hover {
+            transform: scale(1.01);
+        }
+
+        .cart-item img {
+            width: 120px;
+            height: auto;
+            border-radius: 5px;
+            margin-right: 20px;
+            object-fit: cover;
+        }
+
+        .cart-item-info {
+            flex-grow: 1;
+        }
+
+        .cart-item-info h3 {
+            margin: 0 0 10px;
+            color: #222;
+        }
+
+        .cart-item-info p {
+            margin: 4px 0;
+            color: #555;
+        }
+
+        .empty-cart {
+            text-align: center;
+            font-size: 18px;
+            color: #777;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cart-container">
+        <h2> My Cart</h2>
+
+        {% for item in cart_items %}
+            <div class="cart-item">
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                <div class="cart-item-info">
+                    <h3>{{ item.product.name }}</h3>
+                    <p>{{ item.product.description }}</p>
+                    <p><strong>Price:</strong> ₹{{ item.product.price }}</p>
+                    <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                </div>
+            </div>
+            <form action="{% url 'remove_from_cart' item.product.id %}" method="post">
+                             {% csrf_token %}
+            <button type="submit">-</button> {{ item.quantity }}
+            </form>
+        {% empty %}
+            <p class="empty-cart">Your cart is empty.</p>
+        {% endfor %}
+        <a href="{% url 'product_list' %}"> Back to Items </a>
+    </div>
+</body>
+</html>
