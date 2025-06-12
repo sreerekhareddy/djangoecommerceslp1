@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = "my-python-app"
         IMAGE_TAR = "my-python-app.tar"
-        REMOTE_HOST = "remote_user@your.remote.server"
+        REMOTE_HOST = "ec2-user@57.183.32.248"
         REMOTE_PATH = "/tmp"
     }
 
