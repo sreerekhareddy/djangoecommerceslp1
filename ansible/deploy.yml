@@ -8,7 +8,9 @@
       copy:
         src: "{{ image_tar }}"
         dest: "/tmp/{{ image_tar | basename }}"
+        remote_src: yes
         mode: '0644'
+        
 
     - name: Load Docker image from tar
       command: docker load -i /tmp/{{ image_tar | basename }}
