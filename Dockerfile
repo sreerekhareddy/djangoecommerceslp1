@@ -2,7 +2,14 @@ FROM python:3.10-slim
 
 # Set working directory
 WORKDIR /app
-
+# Install required OS packages including pkg-config and MySQL dev headers
+RUN apt-get update && apt-get install -y \
+    gcc \
+    build-essential \
+    libmysqlclient-dev \
+    pkg-config \
+    default-libmysqlclient-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
 COPY requirements.txt .
