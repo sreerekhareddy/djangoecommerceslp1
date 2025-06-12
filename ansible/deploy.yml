@@ -6,7 +6,7 @@
 
     - name: Copy Docker image tar to remote server
       copy:
-        src: "{{ image_tar }}"
+        src: "/tmp/{{ image_tar }}"
         dest: "/tmp/{{ image_tar | basename }}"
         remote_src: yes
         mode: '0644'
