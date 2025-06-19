@@ -4,41 +4,67 @@ pipeline {
     environment {
         IMAGE_NAME = "my-python-app"
         IMAGE_TAR = "my-python-app.tar"
-        REMOTE_HOST = "ec2-user@57.183.32.248"
+        REMOTE_HOST = "35.77.225.156"
         REMOTE_PATH = "/tmp"
     }
 
     stages {
         stage('Clone') {
             steps {
-                git 'https://github.com/yourusername/your-python-app.git'
+                sh "rm -rf djangoecommerceslp && git clone -b master https://github.com/vijayakumarreddymutra/djangoecommerceslp.git"
+                sh "ls -al"
+                sh "git status || echo 'Not a git repo'"
+                
             }
         }
+        stage('Debug1') {
+            steps {
+                sh "ls -l /var/lib/jenkins/workspace/DjangoProject/djangoecommerceslp"
+                }
+            }
 
         stage('Build Docker Image') {
             steps {
+                dir('djangoecommerceslp'){
                 sh "docker build -t $IMAGE_NAME ."
+                }
             }
         }
 
         stage('Save Docker Image as tar') {
             steps {
+                dir('djangoecommerceslp'){
                 sh "docker save -o $IMAGE_TAR $IMAGE_NAME"
+                }
             }
         }
-
-        stage('Transfer tar to Remote Server') {
+        stage('Move tar into ansible folder') {
+         steps {
+             dir('djangoecommerceslp'){
+                 sh "mv $IMAGE_TAR ansible/"
+             }
+               }
+          }
+          
+          stage('Debug') {
             steps {
-                sh "scp $IMAGE_TAR $REMOTE_HOST:$REMOTE_PATH/"
+                dir('djangoecommerceslp'){
+                sh "ls -l ansible/"
+                }
+                }
             }
-        }
 
         stage('Deploy using Ansible') {
             steps {
+                dir('djangoecommerceslp'){
                 sh """
-                    ansible-playbook ansible/deploy.yml -i "$REMOTE_HOST," \
-                    --extra-vars "image_tar=$REMOTE_PATH/$IMAGE_TAR image_name=$IMAGE_NAME"
+                     ansible-playbook ansible/deploy.yml -i "$REMOTE_HOST," \
+            --private-key /var/lib/jenkins/.ssh/tokyoKeypair.pem \
+            --user ec2-user \
+            --extra-vars '{\"image_tar\": \"ansible/${IMAGE_TAR}\", \"image_name\": \"${IMAGE_NAME}\"}' \
+            -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no'"
                 """
+                }
             }
         }
     }
